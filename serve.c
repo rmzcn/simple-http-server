@@ -1,5 +1,7 @@
 #include "handle.c"
 
+#define MAXHANDLESIZE 50
+
 
 int setupServiceSocket(char* ip, char* port);
 int startListening(int* serverSocket, int backlog);
@@ -66,7 +68,7 @@ int startListening(int* serverSocket, int backlog){
 
 
 int run(int *serverSocket){
-        
+            
     while(1) {
         int clientSocket;
         struct sockaddr clientSocketAddr;
@@ -78,10 +80,21 @@ int run(int *serverSocket){
         //handle(serverSocket, &clientSocket);
 
         /******************************************************************************/
-
+        
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, &handle, (void*)&clientSocket);
+        printf("************************* \n");
+        printf("Thread Creation Start \n");
+        int error = pthread_create(&thread_id, NULL, handle, (void*)&clientSocket);
+        if (error != 0)
+            printf("\nThread can't be created : [%s]", strerror(error));
+        
+        printf("Thread Creation End \n");
+        printf("Thread Joining Start \n");
+        
         pthread_join(thread_id, NULL);
+
+        printf("Thread Joining End \n");
+        printf("************************* \n");
 
         /******************************************************************************/
 

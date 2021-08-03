@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 
     serve(argv[1],argv[2]);
     
-    return 0;
+    // return 0;
+    exit(0);
     
 }

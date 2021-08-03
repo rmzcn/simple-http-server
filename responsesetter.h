@@ -28,8 +28,6 @@ char * createResponse(char * headers, char * content){
     strcat(p_response, "\n\n");
     strcat(p_response, content);
 
-    printf("RESPONSE : %s\n", p_response);
-
     return p_response;
 }
 

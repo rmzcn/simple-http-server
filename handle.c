@@ -36,6 +36,12 @@ void * handle(void * clientfd)
     int * clientSocket = (int*)clientfd;
     //new 
 
+    int ERROR = 0;
+
+    pthread_t tid = pthread_self();
+    printf("THREAD ID : %lu\n", tid);
+
+
     int BUFFSIZE = 1024;
     FILE * stream; // for getting request from client
     char * responseContent;
@@ -46,10 +52,16 @@ void * handle(void * clientfd)
     char ** requestLine;
     char *buf = calloc(BUFFSIZE, sizeof(char));
 
+    printf("1\n");
+
+
 
     // open the child socket descriptor as a stream
     if ((stream = fdopen(*clientSocket, "r")) == NULL)
-        printf("ERROR: Request not recieved");
+        printf("ERROR: Request not recieved\n");
+
+    printf("2\n");
+    
     /*
         WARNING:
         DO NOT CLOSE THE 'stream'. IF TURNED OFF, CLIENT SOCKET IS REFUSED.
@@ -58,13 +70,25 @@ void * handle(void * clientfd)
     // get the HTTP request line
     fgets(buf, BUFFSIZE, stream);
 
+    printf("3\n");
+
+
     requestLine = parseRequestLine(buf);
     uri = *(requestLine+1);
     method = *(requestLine);
 
+    printf("4\n");
 
+
+    printf("URI : %s \n", uri);
+
+    
     /**********************************************************************************/
-    if (strcmp(uri, "/") == 0)
+    if (uri == NULL)
+    {
+        responseContent = NULL;
+    }
+    else if (strcmp(uri, "/") == 0)
     {
         responseContent = getTextBasedContent(getFilePathFromLocal(DEFAULT_PAGE));
     }
@@ -74,14 +98,25 @@ void * handle(void * clientfd)
         responseContent = getTextBasedContent(getFilePathFromLocal(uri));
     }
 
+
     if (responseContent == NULL)
     {
-        response = _getTestResponseHeaders(NOT_FOUND, PAGE_404);
+        if (uri == NULL)
+        {
+            response = _getTestResponseHeaders(INTERNAL_SERVER_ERROR, PAGE_500);
+        }
+        else
+        {
+            response = _getTestResponseHeaders(NOT_FOUND, PAGE_404);
+        }
+        
+        // free(responseContent);
     }
 
     else
     {
         response = _getTestResponseHeaders(OK, responseContent);
+        //free(responseContent);
     }
     /**********************************************************************************/
 
@@ -89,7 +124,9 @@ void * handle(void * clientfd)
 
     int isSend = send(*clientSocket, response, strlen(response), 0);
 
-    if(isSend == -1) printf("DATA CAN NOT SENDED !");
+    if(isSend == -1) printf("DATA CAN NOT SENDED !\n");
+    else  printf("Sended.\n");
+    
 
     close(*clientSocket);
     free(buf);
@@ -127,7 +164,7 @@ char * _getTestResponseHeaders(char * responseCode, char * content){
 char** parseRequestLine(char * bufLine)
 {
     char* token;
-    char ** arr = (char**)malloc(sizeof(char*)*3);
+    char ** arr = (char**)calloc(3,sizeof(char*));
     int i = 0;
     while ((token = strtok_r(bufLine, " ", &bufLine)))
     {
