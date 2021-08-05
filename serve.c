@@ -66,11 +66,17 @@ int startListening(int* serverSocket, int backlog){
     return 0;
 }
 
-
 int run(int *serverSocket){
-            
+
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
+
+
+
     while(1) {
-        int clientSocket;
+        int clientSocket = 0;
         struct sockaddr clientSocketAddr;
         socklen_t clientSocketAddrLen;
 
@@ -80,7 +86,7 @@ int run(int *serverSocket){
         //handle(serverSocket, &clientSocket);
 
         /******************************************************************************/
-        
+
         pthread_t thread_id;
         printf("************************* \n");
         printf("Thread Creation Start \n");
@@ -96,11 +102,9 @@ int run(int *serverSocket){
         printf("Thread Joining End \n");
         printf("************************* \n");
 
-        /******************************************************************************/
-
-
-        
+        /******************************************************************************/    
     }
+    pthread_mutex_destroy(&lock);
 
     return -1;
 }

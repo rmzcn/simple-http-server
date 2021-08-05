@@ -30,8 +30,12 @@ char** parseRequestLine(char * bufLine);
 
 // int handle(int * serverSocket, int * clientSocket)
 
+
+pthread_mutex_t lock;
+
 void * handle(void * clientfd)
 {
+    pthread_mutex_lock(&lock);
     //new 
     int * clientSocket = (int*)clientfd;
     //new 
@@ -54,19 +58,17 @@ void * handle(void * clientfd)
 
     printf("1\n");
 
-
-
     // open the child socket descriptor as a stream
-    if ((stream = fdopen(*clientSocket, "r")) == NULL)
+    if ((stream = fdopen(*clientSocket, "r")) == NULL){
         printf("ERROR: Request not recieved\n");
-
+        pthread_exit(NULL);
+    }
     printf("2\n");
-    
     /*
         WARNING:
         DO NOT CLOSE THE 'stream'. IF TURNED OFF, CLIENT SOCKET IS REFUSED.
     */
-
+    
     // get the HTTP request line
     fgets(buf, BUFFSIZE, stream);
 
@@ -130,6 +132,7 @@ void * handle(void * clientfd)
 
     close(*clientSocket);
     free(buf);
+    pthread_mutex_unlock(&lock);
     pthread_exit(NULL);
     // free(uri);
     // free(responseContent);
