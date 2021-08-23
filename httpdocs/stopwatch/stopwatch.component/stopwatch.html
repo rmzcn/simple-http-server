@@ -1,0 +1,9 @@
+<div class="stopwatch-container">
+    <div class="stopwatch-display-container" ng-class="{'shadow-anim':isRunning}" ng-click="toggleStopwatch()" ng-dblclick="resetStopwatch()">
+        <div class="stopwatch">{{minuteTitle}}:{{secondTitle}}</div>
+    </div>
+    <div class="stopwatch-description">
+        Start/Stop: <strong>Single Click</strong> <br>
+        Reset: <strong> Double Click</strong>
+    </div>
+</div>

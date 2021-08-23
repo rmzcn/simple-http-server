@@ -1,7 +1,5 @@
 #include "handle.c"
 
-#define MAXHANDLESIZE 50
-
 
 int setupServiceSocket(char* ip, char* port);
 int startListening(int* serverSocket, int backlog);
@@ -9,7 +7,7 @@ int run(int *serverSocket);
 void getAddress(struct sockaddr *address);
 
 
-// main function fır http server
+// main function for http server
 void serve(char* ip, char* port)
 {
     int serverSocket, listening, running;
@@ -66,45 +64,19 @@ int startListening(int* serverSocket, int backlog){
     return 0;
 }
 
+
 int run(int *serverSocket){
 
-    if (pthread_mutex_init(&lock, NULL) != 0) {
-        printf("\n mutex init has failed\n");
-        return 1;
-    }
-
-
-
-    while(1) {
-        int clientSocket = 0;
+   while(1) {
+        int clientSocket;
         struct sockaddr clientSocketAddr;
         socklen_t clientSocketAddrLen;
 
         clientSocket = accept(*serverSocket, &clientSocketAddr, &clientSocketAddrLen);
         getAddress(&clientSocketAddr); // for log
         
-        //handle(serverSocket, &clientSocket);
-
-        /******************************************************************************/
-
-        pthread_t thread_id;
-        printf("************************* \n");
-        printf("Thread Creation Start \n");
-        int error = pthread_create(&thread_id, NULL, handle, (void*)&clientSocket);
-        if (error != 0)
-            printf("\nThread can't be created : [%s]", strerror(error));
-        
-        printf("Thread Creation End \n");
-        printf("Thread Joining Start \n");
-        
-        pthread_join(thread_id, NULL);
-
-        printf("Thread Joining End \n");
-        printf("************************* \n");
-
-        /******************************************************************************/    
+        handle(&clientSocket);  
     }
-    pthread_mutex_destroy(&lock);
 
     return -1;
 }

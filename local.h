@@ -11,7 +11,6 @@ int getFileLength(FILE *data){
 
 char * getTextBasedContent(char * path)
 {
-    printf("GELEN PATH : %s\n", path);
     FILE *data = fopen(path, "r");
 
     if (data)
@@ -42,4 +41,11 @@ char * getFilePathFromLocal(char * uri){
     strcat(path, uri);
 
     return path;
+}
+
+
+const char *get_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
 }
